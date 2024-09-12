@@ -92,6 +92,13 @@ export default {
         action_import: 'Import',
         label_wallet_name: 'Wallet Name',
         label_mnemonic: 'Please enter your mnemonic words',
+        label_advance: 'Advance',
+        action_custom_path: 'Custom',
+        action_vet_path: 'Vechain',
+        action_eth_path: 'Ethereum',
+        label_path: 'Path',
+        msg_example: 'Example',
+        msg_invalid_path: 'Invalid Path',
         label_ledger_user: 'Ledger user?',
         action_ledger_link: 'Link Now'
     },
@@ -164,7 +171,10 @@ export default {
         msg_backup_tips_1: 'Write it down in given order',
         msg_backup_tips_2: 'Keep it in a secure place',
         msg_backup_tips_3: 'No screenshot or screen recording',
-        label_your_mnemonic: 'Write Down Your Mnemonic Words'
+        label_your_mnemonic: 'Write Down Your Mnemonic Words',
+
+        // notify
+        msg_wallet_not_found: 'Wallet not found'
     },
     sign: {
         title: 'Sign',

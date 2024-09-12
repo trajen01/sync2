@@ -91,6 +91,13 @@ export default {
         action_import: '导入',
         label_wallet_name: '钱包名称',
         label_mnemonic: '请输入您的助记词',
+        label_advance: '高级模式',
+        action_custom_path: '自定义',
+        action_vet_path: 'Vechain',
+        action_eth_path: 'Ethereum',
+        label_path: '路径',
+        msg_example: '示例',
+        msg_invalid_path: '无效助记词路径',
         label_ledger_user: 'Ledger用户？',
         action_ledger_link: '现在绑定'
     },
@@ -163,7 +170,10 @@ export default {
         msg_backup_tips_1: '请按照顺序抄写',
         msg_backup_tips_2: '请确保存放于安全的地方',
         msg_backup_tips_3: '请勿截图或录制屏幕',
-        label_your_mnemonic: '抄写您的助记词'
+        label_your_mnemonic: '抄写您的助记词',
+
+        // notify
+        msg_wallet_not_found: '找不到钱包'
     },
     sign: {
         title: '签名',

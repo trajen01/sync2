@@ -6,6 +6,7 @@ export type Entity = {
     pub: string
     chainCode?: string
     cipherGlob?: string
+    path?: string
 }
 
 export function newVault(entity: Entity): Vault {
@@ -23,7 +24,7 @@ export function newVault(entity: Entity): Vault {
                     unlock: key => {
                         const clearText = vault.decrypt(key)
                         const words = clearText.toString('utf8').split(' ')
-                        return HDNode.fromMnemonic(words).derive(index).privateKey!
+                        return HDNode.fromMnemonic(words, entity.path).derive(index).privateKey!
                     }
                 }
             } else {

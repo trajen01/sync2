@@ -18,7 +18,7 @@ const appBuild = execSync('git --no-pager log -n 1 --date=short --pretty="%ad.%h
   .replace(/-/g, '.')
   .trim()
 
-module.exports = configure(function (/* ctx */) {
+module.exports = configure(function (ctx) {
   return {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
@@ -105,7 +105,8 @@ module.exports = configure(function (/* ctx */) {
         "QChip",
         "QCarousel",
         "QCarouselSlide",
-        "QCheckbox"
+        "QCheckbox",
+        "QOptionGroup"
       ],
       directives: [
         "TouchPan",
@@ -158,6 +159,18 @@ module.exports = configure(function (/* ctx */) {
         if(cfg.target === 'electron-renderer') {
           cfg.externals = cfg.externals || {}
           cfg.externals['node-hid'] = 'commonjs node-hid'
+        }
+
+        if (ctx.modeName === 'pwa') {
+          const CopyWebpackPlugin = require('copy-webpack-plugin')
+          for (const p of cfg.plugins) {
+            if (p instanceof CopyWebpackPlugin) {
+              p.patterns.push({
+                from: path.join(__dirname, 'public'),
+                noErrorOnMissing: true
+              })
+            }
+          }
         }
 
         if (process.env.NODE_ENV === 'production') {
@@ -302,6 +315,7 @@ module.exports = configure(function (/* ctx */) {
         },
         afterSign: "build/notarize.js",
         mac: {
+          hardenedRuntime: true,
           entitlements: "build/entitlements.mac.plist",
           entitlementsInherit: "build/entitlements.mac.plist",
           target: {

@@ -80,6 +80,7 @@ import PageAction from 'components/PageAction.vue'
 import { Account } from '@vechain/hw-app-vet'
 import * as Ledger from 'src/utils/ledger'
 import SvgLedger from 'components/SvgLedger.vue'
+import { BackupDialog } from '../Backup'
 
 const defaultGid = genesises.main.id
 
@@ -93,7 +94,7 @@ export default Vue.extend({
             name: '',
             gid: this.defaultGid || defaultGid,
             error: '',
-            importState: { words: '' }
+            importState: { words: '', path: '' }
         }
     },
     computed: {
@@ -198,10 +199,11 @@ export default Vue.extend({
             }
 
             let words: string[] | undefined
+            let path: string
             if (type === 'import') {
-                // get user input words
+                // get user input words and path
                 try {
-                    words = await this.$dialog<string[]>({
+                    [words, path] = await this.$dialog<[string[], string]>({
                         component: MnemonicInputDialog,
                         state: this.importState
                     })
@@ -213,22 +215,40 @@ export default Vue.extend({
                 const umk = await this.$authenticate()
                 try {
                     // main process
+                    let walletID = -1
+                    let meta: M.Wallet.Meta | null = null
                     await this.$loading(async () => {
+                        words = words || await Vault.generateMnemonic(wordsCount / 3 * 4)
                         const vault = Vault.createHD(
-                            words || await Vault.generateMnemonic(wordsCount / 3 * 4),
-                            umk)
+                            words,
+                            umk,
+                            path)
                         const node0 = vault.derive(0)
-                        await this.$svc.wallet.insert({
+                        meta = {
+                            name: this.name,
+                            type: 'hd',
+                            addresses: [node0.address],
+                            backedUp: type === 'import'
+                        }
+                        walletID = await this.$svc.wallet.insert({
                             gid: this.gid,
                             vault: vault.encode(),
-                            meta: {
-                                name: this.name,
-                                type: 'hd',
-                                addresses: [node0.address],
-                                backedUp: type === 'import'
-                            }
+                            meta: meta
                         })
                     })
+                    // backup in lite mode
+                    if (process.env.MODE === 'spa' || process.env.MODE === 'pwa') {
+                        if (type === 'generate') {
+                            try {
+                                await this.$dialog({
+                                    component: BackupDialog,
+                                    walletId: walletID,
+                                    meta: meta,
+                                    words: words
+                                })
+                            } catch { }
+                        }
+                    }
                     this.$backOrHome()
                     this.$q.notify(this.$t('common.wallet_created'))
                 } catch (err) {
